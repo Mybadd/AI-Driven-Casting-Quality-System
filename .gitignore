@@ -19,6 +19,16 @@ Thumbs.db
 # Logs
 *.log
 
+# Raw datasets
+data/raw/*.csv
+
+# Generated EDA reports and figures
+reports/eda/
+reports/figures/
+reports/*.csv
+reports/*.json
+reports/*.png
+
 # Large trained models
 models/**/*.pkl
 models/**/*.joblib
