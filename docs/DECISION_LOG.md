@@ -118,3 +118,212 @@ Use separate preprocessing strategies for tree-based models and scale-sensitive 
 
 **Why:**  
 Tree-based models generally do not require feature scaling, while models such as Logistic Regression and Linear Regression benefit from standardized numerical features. Separate reusable preprocessing pipelines allow appropriate preprocessing without duplicating code.
+                                MISTAKE
+# Baseline Model Evaluation Decision Log
+
+## Decision: Use Multiple Baseline Models
+
+### Context
+
+The project predicts three casting quality classification targets:
+
+- Defect
+- Porosity
+- Scrap
+
+It also predicts one regression target:
+
+- Yield
+
+Two baseline models were selected for each problem type.
+
+### Classification Models
+
+- Logistic Regression
+- Random Forest Classifier
+
+### Regression Models
+
+- Linear Regression
+- Random Forest Regressor
+
+### Reason
+
+The baseline models provide a simple and interpretable starting point before applying more advanced machine-learning techniques.
+
+Logistic Regression and Linear Regression provide simple reference models.
+
+Random Forest models can capture nonlinear relationships between the selected casting process parameters and the target variables.
+
+---
+
+# Decision: Use Recall and F1-Score as Important Classification Metrics
+
+## Context
+
+The classification targets are imbalanced.
+
+The majority class for all three quality targets is `No`.
+
+For example:
+
+- Defect: approximately 66.5% `No`
+- Porosity: approximately 63.3% `No`
+- Scrap: approximately 77.6% `No`
+
+A model could therefore achieve relatively high accuracy while failing to identify defective or scrap castings.
+
+## Decision
+
+Classification performance should not be judged using accuracy alone.
+
+The project will also evaluate:
+
+- Precision
+- Recall
+- F1-score
+- Confusion Matrix
+
+## Reason
+
+In a casting quality system, failing to identify an actual defect can be more important than correctly predicting the majority `No` class.
+
+Recall and F1-score provide better information about positive-class detection.
+
+---
+
+# Decision: Preserve the Original Five Input Features for Baseline Models
+
+## Selected Features
+
+- Alloy
+- Pour_Temp
+- Mold_Moisture
+- Cooling_Time
+- Riser
+
+## Reason
+
+These five variables represent the selected manufacturing inputs for the initial machine-learning pipeline.
+
+The baseline experiments intentionally use only these features so that later improvements can be compared fairly.
+
+---
+
+# Baseline Evaluation Results
+
+## Defect
+
+### Logistic Regression
+
+- Accuracy: 0.6690
+- Precision: 0.8235
+- Recall: 0.0154
+- F1-score: 0.0303
+
+### Random Forest Classifier
+
+- Accuracy: 0.6550
+- Precision: 0.4405
+- Recall: 0.1101
+- F1-score: 0.1762
+
+### Observation
+
+Random Forest achieved better recall and F1-score than Logistic Regression.
+
+However, both models showed limited ability to identify the positive Defect class.
+
+---
+
+## Porosity
+
+### Logistic Regression
+
+- Accuracy: 0.6443
+- Precision: 0.6054
+- Recall: 0.0894
+- F1-score: 0.1559
+
+### Random Forest Classifier
+
+- Accuracy: 0.6406
+- Precision: 0.5286
+- Recall: 0.1950
+- F1-score: 0.2849
+
+### Observation
+
+Random Forest produced the best baseline F1-score and recall for Porosity.
+
+However, recall remained relatively low.
+
+---
+
+## Scrap
+
+### Logistic Regression
+
+- Accuracy: 0.7760
+- Precision: 0.0000
+- Recall: 0.0000
+- F1-score: 0.0000
+
+### Random Forest Classifier
+
+- Accuracy: 0.7753
+- Precision: 0.4000
+- Recall: 0.0066
+- F1-score: 0.0130
+
+### Observation
+
+Both baseline models performed poorly at detecting the positive Scrap class.
+
+The relatively high accuracy is misleading because the dataset contains a large majority of `No` observations.
+
+This target requires class imbalance investigation.
+
+---
+
+## Yield
+
+### Linear Regression
+
+- MAE: 5.1960
+- RMSE: 6.1754
+- R² Score: 0.0493
+
+### Random Forest Regressor
+
+- MAE: 5.0923
+- RMSE: 6.0754
+- R² Score: 0.0798
+
+### Observation
+
+Random Forest Regressor performed slightly better than Linear Regression.
+
+However, both models achieved low R² scores.
+
+This suggests that the five selected input features have limited predictive power for Yield in the current baseline configuration.
+
+---
+
+# Decision: Improve the Pipeline Incrementally
+
+## Planned Improvements
+
+The following improvements will be tested separately:
+
+1. Class imbalance handling for classification targets.
+2. Cross-validation for more reliable performance estimates.
+3. Feature engineering using the original five manufacturing inputs.
+4. Advanced machine-learning models after the above experiments.
+
+## Reason
+
+Changing multiple parts of the pipeline simultaneously would make it difficult to determine which improvement caused a change in performance.
+
+The project will therefore evaluate improvements incrementally.
+                                MISTAKE
