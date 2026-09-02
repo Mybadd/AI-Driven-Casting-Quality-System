@@ -42,3 +42,17 @@ RANDOM_FOREST_CONFIG: Final[dict[str, int]] = {
     "min_samples_leaf": 2,
     "random_state": RANDOM_STATE,
 }
+BALANCED_RANDOM_FOREST_CONFIG: Final[dict[str, int | str]] = {
+    "n_estimators": 200,
+    "max_depth": 12,
+    "min_samples_split": 5,
+    "min_samples_leaf": 2,
+    "class_weight": "balanced",
+    "random_state": RANDOM_STATE,
+}
+
+
+BALANCED_CLASSIFICATION_MODELS: Final[tuple[str, ...]] = (
+    "balanced_logistic_regression",
+    "balanced_random_forest_classifier",
+)

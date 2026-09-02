@@ -15,6 +15,7 @@ from sklearn.linear_model import (
 )
 
 from src.models.core.model_config import (
+    BALANCED_RANDOM_FOREST_CONFIG,
     RANDOM_FOREST_CONFIG,
     RANDOM_STATE,
 )
@@ -23,21 +24,6 @@ from src.models.core.model_config import (
 def create_classification_model(model_name: str):
     """
     Create and return a classification model.
-
-    Parameters
-    ----------
-    model_name : str
-        Name of the classification model.
-
-    Returns
-    -------
-    sklearn estimator
-        Configured classification estimator.
-
-    Raises
-    ------
-    ValueError
-        If the requested model is not supported.
     """
 
     if model_name == "logistic_regression":
@@ -46,15 +32,26 @@ def create_classification_model(model_name: str):
             random_state=RANDOM_STATE,
         )
 
+    if model_name == "balanced_logistic_regression":
+        return LogisticRegression(
+            max_iter=1000,
+            class_weight="balanced",
+            random_state=RANDOM_STATE,
+        )
+
     if model_name == "random_forest_classifier":
         return RandomForestClassifier(
             **RANDOM_FOREST_CONFIG,
         )
 
+    if model_name == "balanced_random_forest_classifier":
+        return RandomForestClassifier(
+            **BALANCED_RANDOM_FOREST_CONFIG,
+        )
+
     raise ValueError(
         f"Unsupported classification model: {model_name}"
     )
-
 
 def create_regression_model(model_name: str):
     """

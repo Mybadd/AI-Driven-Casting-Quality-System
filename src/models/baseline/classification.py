@@ -55,35 +55,31 @@ def create_classification_pipeline(
         If the model is not supported.
     """
 
-    model = create_classification_model(
-        model_name=model_name,
-    )
-
-    if model_name in SCALED_CLASSIFICATION_MODELS:
+    if model_name in (
+    "logistic_regression",
+    "balanced_logistic_regression",
+):
         preprocessor = create_scaled_preprocessor()
 
-    elif model_name in TREE_CLASSIFICATION_MODELS:
-        preprocessor = create_tree_preprocessor()
+    elif model_name in (
+    "random_forest_classifier",
+    "balanced_random_forest_classifier",
+):
+            preprocessor = create_tree_preprocessor()
 
     else:
         raise ValueError(
-            f"Unsupported classification pipeline: "
-            f"{model_name}"
-        )
-
+        f"Unsupported classification pipeline: {model_name}"
+    )
+    model = create_classification_model(
+    model_name=model_name,
+    )
     return Pipeline(
         steps=[
-            (
-                "preprocessor",
-                preprocessor,
-            ),
-            (
-                "model",
-                model,
-            ),
+            ("preprocessor", preprocessor),
+            ("model", model),
         ]
     )
-
 
 def train_classification_model(
     model_name: str,
