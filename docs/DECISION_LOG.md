@@ -327,3 +327,28 @@ Changing multiple parts of the pipeline simultaneously would make it difficult t
 
 The project will therefore evaluate improvements incrementally.
                                 MISTAKE
+
+Decision: Keep the completed baseline models unchanged as the reference point for future experiments.
+
+Why: The baseline provides a fixed comparison against which class balancing, cross-validation, feature engineering, and later model improvements can be evaluated fairly.
+
+## Decision: Preserve Original Baseline and Add Class-Balanced Experiment
+
+**Decision:** The original baseline models will remain unchanged and will be
+used as the fixed reference point for future experiments.
+
+A separate class-balanced classification experiment was introduced using
+`class_weight="balanced"` for Logistic Regression and Random Forest.
+
+**Reason:** The original baseline models showed poor minority-class recall,
+especially for the Scrap target. Class balancing substantially improved
+recall and F1-score for the `"Yes"` class.
+
+**Trade-off:** Overall accuracy decreased because the balanced models give
+greater importance to minority quality events.
+
+**Implication:** Model improvement will be evaluated using precision, recall,
+and F1-score in addition to accuracy. The next experiment will investigate
+classification probability-threshold tuning.
+
+**Date:** 2026-09-03
