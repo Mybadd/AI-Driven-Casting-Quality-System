@@ -119,7 +119,7 @@ Use separate preprocessing strategies for tree-based models and scale-sensitive 
 **Why:**  
 Tree-based models generally do not require feature scaling, while models such as Logistic Regression and Linear Regression benefit from standardized numerical features. Separate reusable preprocessing pipelines allow appropriate preprocessing without duplicating code.
                                 MISTAKE
-# Baseline Model Evaluation Decision Log
+# Baseline Model Evaluation
 
 ## Decision: Use Multiple Baseline Models
 
@@ -352,3 +352,107 @@ and F1-score in addition to accuracy. The next experiment will investigate
 classification probability-threshold tuning.
 
 **Date:** 2026-09-03
+
+## Decision: Introduce Reusable Feature Engineering
+
+**Decision:** Introduce a dedicated feature-engineering module before
+evaluating more advanced machine-learning models.
+
+**Reason:** The dataset currently provides only five approved ML input
+features, and initial model results indicate limited predictive strength.
+Derived relationships may allow the models to capture nonlinear effects and
+interactions already implicit in the available process variables.
+
+**Implementation:** Create `src/features/engineering.py` containing
+engineering-motivated transformations based only on:
+- Pour_Temp
+- Mold_Moisture
+- Cooling_Time
+- Riser
+
+**Constraints:**
+- No external raw variables.
+- `Batch` remains an identifier and is not used as an ML feature.
+- Target variables are never used to construct features.
+- Engineered features must be evaluated empirically.
+- Features will not be retained solely because they are mathematically
+  possible; validation performance must justify their use.
+
+**Validation approach:** Compare the original feature set against the
+expanded feature set using stratified cross-validation before deciding
+whether the engineered features should be retained.
+
+**Date:** 2026-09-03
+
+## Decision: Retain Balanced Logistic Regression as Current Classification Reference
+
+**Decision:** Balanced Logistic Regression remains the current reference
+candidate for quality-event detection. XGBoost is retained as an advanced
+comparison model.
+
+**Reason:** XGBoost improved accuracy for Defect, Porosity, and Scrap, but
+consistently reduced recall and F1-score relative to the balanced Logistic
+Regression model.
+
+**Engineering interpretation:** Accuracy alone is not sufficient for the
+casting-quality use case. The system must consider the trade-off between
+missing potential quality events and generating false alarms.
+
+**Current status:** No final production model or threshold has been selected.
+
+**Next step:** SHAP-based explainability followed by metallurgical
+interpretation and definition of the engineering decision policy.
+
+**Date:** 2026-09-03
+
+## Decision: Engineering Decision Policy and Threshold Selection
+
+### Date
+2026-09-06
+
+### Context
+Initial threshold selection based only on maximum F1 produced impractically high alert rates, often close to 100%. Therefore, threshold selection was changed from an F1-only approach to an engineering decision-policy approach.
+
+### Decision Policy
+A prototype project-level decision policy was defined:
+
+- Minimum recall: 50%
+- Maximum alert rate: 50%
+- No hard precision constraint at this stage
+
+The purpose is to require the model to identify at least half of the historical positive quality events while limiting the investigation workload to approximately half of the batches.
+
+This is a configurable project decision policy and is not claimed to be an industry-standard foundry threshold.
+
+### Threshold Selection Method
+Thresholds are selected using out-of-fold (OOF) predictions generated from the training portion of the dataset.
+
+The held-out 20% test set is not used for threshold selection.
+
+The ranking of feasible thresholds is:
+
+1. Higher recall
+2. Higher precision
+3. Lower alert rate
+4. Higher threshold
+
+If no threshold satisfies the policy constraints, no threshold is selected.
+
+### Selected Operating Points
+
+| Target | Model | Selected Threshold |
+|---|---|---:|
+| Defect | XGBoost | 0.48 |
+| Porosity | XGBoost | 0.47 |
+| Scrap | Balanced Logistic Regression | 0.50 |
+
+XGBoost was selected for Defect and Porosity because it provided slightly better recall, precision, F1, and alert-rate performance at the policy operating point.
+
+For Scrap, XGBoost did not provide a feasible threshold satisfying both the minimum recall and maximum alert-rate constraints. Therefore, Balanced Logistic Regression remains the current candidate.
+
+### Important Limitation
+These operating points are model-selection results, not evidence that the models provide production-ready quality decisions.
+
+The selected thresholds must be evaluated once on the untouched 20% test set before being considered final.
+
+The system should also support an uncertain/review state rather than forcing a binary engineering decision when model evidence is weak.

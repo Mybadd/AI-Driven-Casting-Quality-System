@@ -9,7 +9,7 @@ from src.features.schema import (
     CATEGORICAL_FEATURES,
     NUMERICAL_FEATURES,
 )
-
+from sklearn.compose import ColumnTransformer
 
 def create_tree_preprocessor() -> ColumnTransformer:
     """
@@ -69,6 +69,30 @@ def create_scaled_preprocessor() -> ColumnTransformer:
                 "numerical",
                 numeric_pipeline,
                 NUMERICAL_FEATURES,
+            ),
+        ]
+    )
+def create_scaled_preprocessor_for_features(
+    numerical_features: list[str],
+) -> ColumnTransformer:
+    """
+    Create a scaled preprocessor for a custom numerical feature set.
+
+    Alloy remains one-hot encoded while the supplied numerical features
+    are standardized.
+    """
+
+    return ColumnTransformer(
+        transformers=[
+            (
+                "categorical",
+                OneHotEncoder(handle_unknown="ignore"),
+                ["Alloy"],
+            ),
+            (
+                "numerical",
+                StandardScaler(),
+                numerical_features,
             ),
         ]
     )
