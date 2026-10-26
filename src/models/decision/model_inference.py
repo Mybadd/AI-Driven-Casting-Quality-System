@@ -1,7 +1,9 @@
+
 """Reusable inference utilities for trained casting-quality models."""
 
 from __future__ import annotations
 
+from functools import lru_cache
 from pathlib import Path
 from typing import Dict
 
@@ -14,7 +16,6 @@ from src.features.schema import INPUT_FEATURES
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
 MODEL_DIRECTORY = PROJECT_ROOT / "models"
 
-
 SUPPORTED_TARGETS = {
     "Defect": "defect",
     "Porosity": "porosity",
@@ -22,8 +23,9 @@ SUPPORTED_TARGETS = {
 }
 
 
+@lru_cache(maxsize=3)
 def load_model(target: str):
-    """Load the trained XGBoost pipeline for a quality target."""
+    """Load and cache the trained XGBoost pipeline for a quality target."""
 
     if target not in SUPPORTED_TARGETS:
         raise ValueError(

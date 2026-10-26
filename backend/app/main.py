@@ -1,8 +1,7 @@
 from typing import Dict
 
-from fastapi import FastAPI
 from pydantic import BaseModel
-
+from fastapi import FastAPI, HTTPException
 from src.analysis.prediction_service import analyze_casting_input
 
 from src.analysis.engineering_decision_service import build_engineering_decision
@@ -51,12 +50,19 @@ def predict_casting(casting_input: CastingInput) -> Dict:
 @app.post("/api/analyze")
 def analyze_casting(casting_input: CastingInput) -> Dict:
     return build_engineering_decision(casting_input.model_dump())
-j
+
+
 @app.post("/api/scenarios")
 def explore_casting_scenarios(request: ScenarioRequest) -> Dict:
-    return explore_scenarios(
-        target=request.target,
-        base_input=request.base_input.model_dump(),
-        parameter_grid=request.parameter_grid,
-        top_n=request.top_n,
-    )
+    try:
+        return explore_scenarios(
+            target=request.target,
+            base_input=request.base_input.model_dump(),
+            parameter_grid=request.parameter_grid,
+            top_n=request.top_n,
+        )
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=422,
+            detail=str(exc),
+        ) from exc
