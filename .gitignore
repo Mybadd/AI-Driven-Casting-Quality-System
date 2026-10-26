@@ -1,12 +1,15 @@
 # Python virtual environment
 .venv/
+venv/
 
 # Python cache
 __pycache__/
 *.py[cod]
 
-# Environment variables
+# Environment variables and secrets
 .env
+.env.*
+!.env.example
 
 # IDE settings
 .vscode/
@@ -16,22 +19,40 @@ __pycache__/
 .DS_Store
 Thumbs.db
 
-# Logs
+# Logs and temporary files
 *.log
+*.tmp
 
-# Raw datasets
+# Python test and tooling caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Frontend dependencies and build artifacts
+frontend/node_modules/
+frontend/dist/
+frontend/dist-ssr/
+
+# Local SQLite databases and sidecar files
+*.sqlite
+*.sqlite3
+*.db
+*.sqlite-shm
+*.sqlite-wal
+
+# Raw development datasets
 data/raw/*.csv
-
-
+# Independent validation data — keep separate from development
+/RAT_Readings_Synthetic_Validation.csv
 # Generated reports
 reports/**/*.md
 reports/**/*.csv
 reports/**/*.json
 reports/**/*.png
-# Large trained models
+
+# Large trained model artifacts
 models/**/*.pkl
 models/**/*.joblib
 models/**/*.h5
-
-# Temporary files
-*.tmp
